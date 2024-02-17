@@ -1,0 +1,1 @@
+dotnet run --project Sajan.Abpvue --migrate-database

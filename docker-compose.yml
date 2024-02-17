@@ -1,0 +1,13 @@
+﻿services:
+  sajan.abpvue:
+    image: sajan.abpvue
+    build:
+      context: .
+      dockerfile: Sajan.Abpvue/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings:Default=Host=host.docker.internal;Port=5432;Database=Abpvue;User ID=postgres;Password=password;
+      - ASPNETCORE_URLS=http://+:8000
+    ports:
+        - "8000:8000"
+        - "8082:8082"  
