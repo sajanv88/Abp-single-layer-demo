@@ -159,7 +159,7 @@ public class AbpvueModule : AbpModule
         ConfigureUrls(configuration);
         ConfigureBundles();
         ConfigureAutoMapper(context);
-        ConfigureSwagger(context.Services);
+        ConfigureSwagger(context.Services, configuration);
         ConfigureNavigationServices();
         ConfigureAutoApiControllers();
         ConfigureVirtualFiles(hostingEnvironment);
@@ -275,16 +275,21 @@ public class AbpvueModule : AbpModule
         });
     }
 
-    private void ConfigureSwagger(IServiceCollection services)
+    private void ConfigureSwagger(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAbpSwaggerGen(
-            options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Abpvue API", Version = "v1" });
-                options.DocInclusionPredicate((docName, description) => true);
-                options.CustomSchemaIds(type => type.FullName);
-            }
-        );
+       
+        var authority = configuration["AuthServer:Authority"];
+        services.AddAbpSwaggerGenWithOAuth(authority, new Dictionary<string, string>
+        {
+            { "Abpvue", "Abpvue API" }
+        }, options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Abpvue API", Version = "v1" });
+            options.DocInclusionPredicate((docName, description) => true);
+            options.CustomSchemaIds(type => type.FullName);
+            options.CustomOperationIds(options => $"{options.ActionDescriptor.RouteValues["controller"]}{options.ActionDescriptor.RouteValues["action"]}");
+
+        });
     }
 
     private void ConfigureAutoMapper(ServiceConfigurationContext context)
@@ -357,6 +362,11 @@ public class AbpvueModule : AbpModule
         app.UseAbpSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Abpvue API");
+            var configuration = context.GetConfiguration();
+            options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
+            options.OAuthScopes("AbpVueTemplate");
+
+            
         });
 
         app.UseAuditing();

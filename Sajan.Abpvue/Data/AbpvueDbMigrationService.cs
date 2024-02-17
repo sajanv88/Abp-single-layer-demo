@@ -17,17 +17,18 @@ public class AbpvueDbMigrationService : ITransientDependency
     private readonly AbpvueEFCoreDbSchemaMigrator _dbSchemaMigrator;
     private readonly ITenantRepository _tenantRepository;
     private readonly ICurrentTenant _currentTenant;
-
+    private readonly OpenIddictDataSeedContributor _openIddictDataSeedContributor;
     public AbpvueDbMigrationService(
         IDataSeeder dataSeeder,
         AbpvueEFCoreDbSchemaMigrator dbSchemaMigrator,
         ITenantRepository tenantRepository,
-        ICurrentTenant currentTenant)
+        ICurrentTenant currentTenant, OpenIddictDataSeedContributor openIddictDataSeedContributor)
     {
         _dataSeeder = dataSeeder;
         _dbSchemaMigrator = dbSchemaMigrator;
         _tenantRepository = tenantRepository;
         _currentTenant = currentTenant;
+        _openIddictDataSeedContributor = openIddictDataSeedContributor;
 
         Logger = NullLogger<AbpvueDbMigrationService>.Instance;
     }
@@ -45,6 +46,7 @@ public class AbpvueDbMigrationService : ITransientDependency
 
         await MigrateDatabaseSchemaAsync();
         await SeedDataAsync();
+        await _openIddictDataSeedContributor.SeedAsync(new DataSeedContext());
 
         Logger.LogInformation($"Successfully completed host database migrations.");
 
@@ -93,6 +95,7 @@ public class AbpvueDbMigrationService : ITransientDependency
             .WithProperty(IdentityDataSeedContributor.AdminEmailPropertyName, IdentityDataSeedContributor.AdminEmailDefaultValue)
             .WithProperty(IdentityDataSeedContributor.AdminPasswordPropertyName, IdentityDataSeedContributor.AdminPasswordDefaultValue)
         );
+        
     }
 
     private bool AddInitialMigrationIfNotExist()
