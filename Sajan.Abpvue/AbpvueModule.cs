@@ -124,7 +124,7 @@ public class AbpvueModule : AbpModule
         {
             builder.AddValidation(options =>
             {
-                options.AddAudiences("Abpvue");
+                options.AddAudiences("AbpVueTemplate");
                 options.UseLocalServer();
                 options.UseAspNetCore();
             });
@@ -364,7 +364,7 @@ public class AbpvueModule : AbpModule
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Abpvue API");
             var configuration = context.GetConfiguration();
             options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
-            options.OAuthScopes("AbpVueTemplate");
+            options.OAuthScopes("openid profile roles email phone AbpVueTemplate");
 
             
         });

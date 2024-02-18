@@ -44,7 +44,7 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
 
     private async Task CreateScopesAsync()
     {
-        if (await _scopeManager.FindByNameAsync("AbpTemplate") == null)
+        if (await _scopeManager.FindByNameAsync("AbpVueTemplate") == null)
         {
             await _scopeManager.CreateAsync(new OpenIddictScopeDescriptor
             {
