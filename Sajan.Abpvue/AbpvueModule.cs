@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using Sajan.Abpvue.Data;
@@ -6,7 +7,6 @@ using Sajan.Abpvue.Localization;
 using Sajan.Abpvue.Menus;
 using OpenIddict.Validation.AspNetCore;
 using Volo.Abp;
-using Volo.Abp.Uow;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
@@ -50,6 +50,8 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Sajan.Abpvue;
 
@@ -165,6 +167,19 @@ public class AbpvueModule : AbpModule
         ConfigureVirtualFiles(hostingEnvironment);
         ConfigureLocalization();
         ConfigureEfCore(context);
+        context.Services.AddCookiePolicy(options =>
+        {
+            options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+            options.Secure = CookieSecurePolicy.Always;
+        });
+        context.Services.AddDataProtection()
+            .SetApplicationName("Abpvue")
+            .PersistKeysToDbContext<AbpvueDbContext>();
+        context.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedProto;
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

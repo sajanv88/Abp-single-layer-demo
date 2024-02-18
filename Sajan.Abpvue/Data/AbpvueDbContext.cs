@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
@@ -10,7 +11,7 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
 namespace Sajan.Abpvue.Data;
 
-public class AbpvueDbContext : AbpDbContext<AbpvueDbContext>
+public class AbpvueDbContext : AbpDbContext<AbpvueDbContext>, IDataProtectionKeyContext
 {
     public AbpvueDbContext(DbContextOptions<AbpvueDbContext> options)
         : base(options)
@@ -33,4 +34,6 @@ public class AbpvueDbContext : AbpDbContext<AbpvueDbContext>
 
         /* Configure your own entities here */
     }
+
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null;
 }
