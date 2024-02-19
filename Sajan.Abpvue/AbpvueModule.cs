@@ -178,8 +178,12 @@ public class AbpvueModule : AbpModule
             .PersistKeysToDbContext<AbpvueDbContext>();
         context.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            options.ForwardedHeaders =
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
                 ForwardedHeaders.XForwardedProto;
+            options.RequireHeaderSymmetry = false;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+            
         });
     }
 
