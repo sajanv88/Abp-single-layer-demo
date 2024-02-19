@@ -126,6 +126,7 @@ public class AbpvueModule : AbpModule
         {
             builder.AddValidation(options =>
             {
+                options.SetIssuer("https://authabp.sajankumarv.com");
                 options.AddAudiences("AbpVueTemplate");
                 options.UseLocalServer();
                 options.UseAspNetCore();
