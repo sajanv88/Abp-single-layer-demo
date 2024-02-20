@@ -126,7 +126,6 @@ public class AbpvueModule : AbpModule
         {
             builder.AddValidation(options =>
             {
-                options.SetIssuer("https://authabp.sajankumarv.com");
                 options.AddAudiences("AbpVueTemplate");
                 options.UseLocalServer();
                 options.UseAspNetCore();
@@ -168,23 +167,11 @@ public class AbpvueModule : AbpModule
         ConfigureVirtualFiles(hostingEnvironment);
         ConfigureLocalization();
         ConfigureEfCore(context);
-        context.Services.AddCookiePolicy(options =>
-        {
-            options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
-            options.Secure = CookieSecurePolicy.Always;
-        });
+       
+        
         context.Services.AddDataProtection()
             .SetApplicationName("Abpvue")
             .PersistKeysToDbContext<AbpvueDbContext>();
-        context.Services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-                ForwardedHeaders.XForwardedProto;
-            options.RequireHeaderSymmetry = false;
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-            
-        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -350,10 +337,19 @@ public class AbpvueModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
-
+        
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto
+        });
+        
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseHttpsRedirection();
         }
 
         app.UseAbpRequestLocalization();
@@ -362,7 +358,13 @@ public class AbpvueModule : AbpModule
         {
             app.UseErrorPage();
         }
-
+        
+        app.UseCookiePolicy(new CookiePolicyOptions
+        {
+            Secure =   CookieSecurePolicy.Always,
+            MinimumSameSitePolicy = SameSiteMode.None
+        });
+        
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();
@@ -377,7 +379,7 @@ public class AbpvueModule : AbpModule
         app.UseUnitOfWork();
         app.UseDynamicClaims();
         app.UseAuthorization();
-
+       
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>
         {
@@ -385,7 +387,6 @@ public class AbpvueModule : AbpModule
             var configuration = context.GetConfiguration();
             options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             options.OAuthScopes("openid profile roles email phone AbpVueTemplate");
-
             
         });
 
