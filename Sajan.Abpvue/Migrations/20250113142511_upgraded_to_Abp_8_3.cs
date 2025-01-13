@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Sajan.Abpvue.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class upgraded_to_Abp_8_3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -256,6 +257,27 @@ namespace Sajan.Abpvue.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AbpSessions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SessionId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Device = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    DeviceInfo = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    IpAddresses = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    SignedIn = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    LastAccessed = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbpSessions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AbpSettingDefinitions",
                 columns: table => new
                 {
@@ -296,6 +318,7 @@ namespace Sajan.Abpvue.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    NormalizedName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     EntityVersion = table.Column<int>(type: "integer", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: false),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
@@ -367,6 +390,20 @@ namespace Sajan.Abpvue.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AbpUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DataProtectionKeys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FriendlyName = table.Column<string>(type: "text", nullable: true),
+                    Xml = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -677,14 +714,7 @@ namespace Sajan.Abpvue.Migrations
                     Subject = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
                     Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     ExtraProperties = table.Column<string>(type: "text", nullable: false),
-                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -736,14 +766,7 @@ namespace Sajan.Abpvue.Migrations
                     Subject = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
                     Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     ExtraProperties = table.Column<string>(type: "text", nullable: false),
-                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -893,6 +916,21 @@ namespace Sajan.Abpvue.Migrations
                 columns: new[] { "TenantId", "UserId" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AbpSessions_Device",
+                table: "AbpSessions",
+                column: "Device");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbpSessions_SessionId",
+                table: "AbpSessions",
+                column: "SessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbpSessions_TenantId_UserId",
+                table: "AbpSessions",
+                columns: new[] { "TenantId", "UserId" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AbpSettingDefinitions_Name",
                 table: "AbpSettingDefinitions",
                 column: "Name",
@@ -908,6 +946,11 @@ namespace Sajan.Abpvue.Migrations
                 name: "IX_AbpTenants_Name",
                 table: "AbpTenants",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbpTenants_NormalizedName",
+                table: "AbpTenants",
+                column: "NormalizedName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbpUserClaims_UserId",
@@ -1023,6 +1066,9 @@ namespace Sajan.Abpvue.Migrations
                 name: "AbpSecurityLogs");
 
             migrationBuilder.DropTable(
+                name: "AbpSessions");
+
+            migrationBuilder.DropTable(
                 name: "AbpSettingDefinitions");
 
             migrationBuilder.DropTable(
@@ -1048,6 +1094,9 @@ namespace Sajan.Abpvue.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "DataProtectionKeys");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictScopes");

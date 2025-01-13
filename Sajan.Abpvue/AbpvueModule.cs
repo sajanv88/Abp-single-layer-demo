@@ -52,6 +52,7 @@ using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Volo.Abp.Data;
 
 namespace Sajan.Abpvue;
 
@@ -233,16 +234,14 @@ public class AbpvueModule : AbpModule
             options.Languages.Add(new LanguageInfo("hu", "hu", "Magyar"));
             options.Languages.Add(new LanguageInfo("fi", "fi", "Finnish"));
             options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
-            options.Languages.Add(new LanguageInfo("hi", "hi", "Hindi", "in"));
-            options.Languages.Add(new LanguageInfo("is", "is", "Icelandic", "is"));
-            options.Languages.Add(new LanguageInfo("it", "it", "Italiano", "it"));
+          
             options.Languages.Add(new LanguageInfo("pt-BR", "pt-BR", "Português"));
             options.Languages.Add(new LanguageInfo("ro-RO", "ro-RO", "Română"));
             options.Languages.Add(new LanguageInfo("ru", "ru", "Русский"));
             options.Languages.Add(new LanguageInfo("sk", "sk", "Slovak"));
             options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
             options.Languages.Add(new LanguageInfo("zh-Hant", "zh-Hant", "繁體中文"));
-            options.Languages.Add(new LanguageInfo("de-DE", "de-DE", "Deutsch", "de"));
+
             options.Languages.Add(new LanguageInfo("es", "es", "Español"));
             options.Languages.Add(new LanguageInfo("el", "el", "Ελληνικά"));
         });
@@ -333,15 +332,12 @@ public class AbpvueModule : AbpModule
 
     }
 
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
+    public  override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
         
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto
-        });
+     
         
         if (env.IsDevelopment())
         {
@@ -349,6 +345,10 @@ public class AbpvueModule : AbpModule
         }
         else
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto
+            });
             app.UseHttpsRedirection();
         }
 
