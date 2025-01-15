@@ -20,24 +20,27 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
     private readonly IOpenIddictScopeManager _scopeManager;
     private readonly IPermissionDataSeeder _permissionDataSeeder;
     private readonly IStringLocalizer<OpenIddictResponse> L;
+    private readonly ILogger<OpenIddictDataSeedContributor> _logger;
 
     public OpenIddictDataSeedContributor(
         IConfiguration configuration,
         IOpenIddictApplicationManager applicationManager,
         IOpenIddictScopeManager scopeManager,
         IPermissionDataSeeder permissionDataSeeder,
-        IStringLocalizer<OpenIddictResponse> l)
+        IStringLocalizer<OpenIddictResponse> l,
+        ILogger<OpenIddictDataSeedContributor> logger)
     {
         _configuration = configuration;
         _applicationManager = applicationManager;
         _scopeManager = scopeManager;
         _permissionDataSeeder = permissionDataSeeder;
         L = l;
+        _logger = logger;
     }
 
-    [UnitOfWork]
-    public virtual async Task SeedAsync(DataSeedContext context)
+    public  async Task SeedAsync(DataSeedContext context)
     {
+        _logger.LogInformation("Started seeding OpenIddict data...");
         await CreateScopesAsync();
         await CreateApplicationsAsync();
     }

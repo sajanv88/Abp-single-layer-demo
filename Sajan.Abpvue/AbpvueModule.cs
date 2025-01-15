@@ -53,6 +53,7 @@ using Volo.Abp.VirtualFileSystem;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Volo.Abp.Data;
+using Volo.Abp.Uow;
 
 namespace Sajan.Abpvue;
 
@@ -329,19 +330,22 @@ public class AbpvueModule : AbpModule
                 configurationContext.UseNpgsql();
             });
         });
-
+        
+  
     }
 
     public  override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
+        var dataSeedContext = context.ServiceProvider.GetService<DataSeedContext>();
+        var dataSeedContributor = context.ServiceProvider.GetService<OpenIddictDataSeedContributor>();
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
         
-     
-        
         if (env.IsDevelopment())
         {
+            dataSeedContributor.SeedAsync(dataSeedContext).Wait();
             app.UseDeveloperExceptionPage();
+        
         }
         else
         {
