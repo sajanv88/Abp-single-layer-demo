@@ -134,7 +134,7 @@ public class AbpvueModule : AbpModule
             });
         });
 
-        if (!hostingEnvironment.IsDevelopment())
+        if (hostingEnvironment.IsDevelopment())
         {
             PreConfigure<AbpOpenIddictAspNetCoreOptions>(options =>
             {

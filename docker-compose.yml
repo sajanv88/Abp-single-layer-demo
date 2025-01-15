@@ -7,7 +7,6 @@
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings:Default=Host=host.docker.internal;Port=5432;Database=Abpvue;User ID=postgres;Password=password;
-      - ASPNETCORE_URLS=http://+:8000
+      - ASPNETCORE_URLS=http://+:8002
     ports:
-        - "8000:8000"
-        - "8082:8082"  
+        - "8002:8002"
